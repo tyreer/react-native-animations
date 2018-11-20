@@ -5,12 +5,12 @@ This repo contains Expo-compatible code for 9 of the animation examples [Jason B
 
 __Each example can be found on its own branch__
 
-__Takeaways__
-+ I found that the course offered some rich examples of how the [Animated library](https://facebook.github.io/react-native/docs/animated) can be used. 
+__Takeaways:__
++ I found that the course offered some rich examples of how the [Animated library](https://facebook.github.io/react-native/docs/animated) can be used
 + The _swipe-away-modal_ example also helped shed some light on using RN's [PanResponder](https://facebook.github.io/react-native/docs/panresponder)
 
 
-On __Android devices__, all examples are accessible via Expo:
+On __Android devices__, all examples are accessible by scanning the QR codes at these links with the [Expo Client](https://expo.io/learn) app:
 + [horizontal-parallax-scrollview](https://exp.host/@tyreer/horizontal-parallax-scrollview)
 + [information-callout](https://exp.host/@tyreer/information-callout)
 + [bouncy-heart](https://exp.host/@tyreer/bouncy-heart)
@@ -25,7 +25,7 @@ On __iOS devices__, you'll need to:
 + download the [source code](https://github.com/tyreer/react-native-animations)
 + install dependencies by running `yarn`
 + start a local server by running `expo start` 
-+ open the app via an iOS simulator or the [Expo Client app](https://expo.io/learn)
++ open the app via an iOS simulator or the [Expo Client](https://expo.io/learn) app
 
 # Notes on Real World React Native Animations
 Below are my learning notes on the examples, which are mostly for me to remember key points, but might be useful to others too.
