@@ -2,103 +2,124 @@ import React, { Component } from "react";
 import {
   StyleSheet,
   Text,
-  Animated,
   View,
-  ImageBackground,
-  ScrollView,
+  Animated,
+  TextInput,
+  TouchableWithoutFeedback,
   TouchableOpacity
 } from "react-native";
 
-import Portland from "./portland.jpg";
-
 export default class App extends Component {
   state = {
-    open: false,
-    animated: new Animated.Value(0)
+    animate: new Animated.Value(0),
+    success: false
   };
 
-  toggleCard = () => {
+  handlePress = () => {
+    Animated.timing(this.state.animate, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true
+    }).start();
+  };
+
+  handleSend = () => {
     this.setState(
-      state => ({
-        open: !state.open
-      }),
+      {
+        success: true
+      },
       () => {
-        const toValue = this.state.open ? 1 : 0;
-        Animated.timing(this.state.animated, {
-          toValue,
-          duration: 500
-        }).start();
+        Animated.sequence([
+          Animated.timing(this.state.animate, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true
+          }),
+          Animated.delay(1500)
+        ]).start(() => this.setState({ success: false }));
       }
     );
   };
 
   render() {
-    const offsetInterpolate = this.state.animated.interpolate({
-      inputRange: [0, 1],
-      outputRange: [191, 0]
+    const notifyTextScaleInterpolate = this.state.animate.interpolate({
+      inputRange: [0, 0.5],
+      outputRange: [1, 0],
+      extrapolate: "clamp"
     });
 
-    const arrowRotate = this.state.animated.interpolate({
-      inputRange: [0, 1],
-      outputRange: ["180deg", "0deg"]
+    const inputScaleInterpolate = this.state.animate.interpolate({
+      inputRange: [0, 0.5, 0.6],
+      outputRange: [0, 0, 1],
+      extrapolate: "clamp"
     });
 
-    const offsetStyle = {
-      transform: [{ translateY: offsetInterpolate }]
+    const sendButtonInterpolate = this.state.animate.interpolate({
+      inputRange: [0, 0.6, 1],
+      outputRange: [0, 0, 1]
+    });
+
+    const thankyouScaleInterpolate = this.state.animate.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 0]
+    });
+
+    const notifyTextStyle = {
+      transform: [{ scale: notifyTextScaleInterpolate }]
     };
 
-    const arrowStyle = {
-      transform: [{ rotate: arrowRotate }]
+    const thankyouTextStyle = {
+      transform: [{ scale: thankyouScaleInterpolate }]
     };
 
-    const opacityStyle = {
-      opacity: this.state.animated
+    const inputWrapStyle = {
+      transform: [{ scale: inputScaleInterpolate }]
     };
 
+    const sendButtonStyle = {
+      transform: [{ scale: sendButtonInterpolate }]
+    };
+
+    const { success } = this.state;
     return (
       <View style={styles.container}>
-        <ImageBackground
-          source={Portland}
-          resizeMode="cover"
-          style={styles.background}
-        >
-          <Animated.View style={[styles.card, offsetStyle]}>
-            <TouchableOpacity onPress={this.toggleCard}>
-              <View style={styles.header}>
-                <View>
-                  <Text style={styles.title}>Portland, Oregon</Text>
-                  <Text style={styles.date}>June 24th</Text>
-                </View>
-                <View style={styles.arrowContainer}>
-                  <Animated.Text style={[styles.arrow, arrowStyle]}>
-                    ↓
-                  </Animated.Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <Animated.View style={[styles.scrollViewWrap, opacityStyle]}>
-              <ScrollView contentContainerStyle={styles.scrollView}>
-                <Text>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-                  eget sodales est. Donec facilisis, urna nec scelerisque
-                  pellentesque, nulla est euismod nunc, sed lacinia ex nunc
-                  placerat neque. Proin malesuada venenatis leo. Etiam viverra
-                  ipsum nec justo pharetra, eget rutrum enim eleifend. Ut eu
-                  mollis mi. Aenean eget nisl nibh. Sed sed elit eget nisi
-                  tincidunt elementum vitae vitae orci. Phasellus porta vitae
-                  purus eu molestie. Nulla cursus eros odio, sit amet
-                  pellentesque felis semper eu. Mauris id facilisis libero.
-                  Nullam posuere sed magna quis aliquam. Praesent sodales
-                  vulputate sollicitudin. Ut in rutrum eros, ac facilisis augue.
-                  Suspendisse consequat, erat ut convallis tincidunt, enim sem
-                  auctor ligula, sit amet congue arcu ligula at tortor. Morbi a
-                  elit varius, blandit tellus suscipit, tincidunt erat. Mauris
-                  feugiat cursus bibendum.
-                </Text>
-              </ScrollView>
-            </Animated.View>
+        <TouchableWithoutFeedback onPress={this.handlePress}>
+          <Animated.View style={styles.buttonWrap}>
+            {!success && (
+              <Animated.View
+                style={[
+                  StyleSheet.absoluteFill,
+                  styles.inputWrap,
+                  inputWrapStyle
+                ]}
+              >
+                <TextInput
+                  keyboardType="email-address"
+                  placeholder="Email"
+                  placeholderTextColor="rgba(255,123,115, 0.8)"
+                  style={styles.textInput}
+                />
+                <TouchableOpacity
+                  style={[styles.sendButton, sendButtonStyle]}
+                  onPress={this.handleSend}
+                >
+                  <Text style={styles.sendText}>Send</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+
+            {!success && (
+              <Animated.View style={notifyTextStyle}>
+                <Text style={styles.notifyText}>Notify Me</Text>
+              </Animated.View>
+            )}
+            {success && (
+              <Animated.View style={thankyouTextStyle}>
+                <Text style={styles.notifyText}>Thank You</Text>
+              </Animated.View>
+            )}
           </Animated.View>
-        </ImageBackground>
+        </TouchableWithoutFeedback>
       </View>
     );
   }
@@ -109,51 +130,42 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#152536"
-  },
-  background: {
-    width: 300,
-    height: 250,
-    borderRadius: 3,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,.5)"
-  },
-  scrollViewWrap: {
-    flex: 1
-  },
-  card: {
-    backgroundColor: "#FFF",
-    flex: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 4,
-    transform: [
-      {
-        translateY: 191
-      }
-    ]
-  },
-  scrollView: {
-    marginTop: 15
-  },
-  header: {
+    backgroundColor: "#FF7B73",
     flexDirection: "row"
   },
-  title: {
-    fontSize: 24,
-    color: "#333"
+  buttonWrap: {
+    backgroundColor: "#FFF",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    maxWidth: "80%",
+    flex: 1
   },
-  date: {
-    fontSize: 18,
-    color: "#333"
+  notifyText: {
+    color: "#FF7B73",
+    fontWeight: "bold"
   },
-  arrowContainer: {
+  inputWrap: {
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingVertical: 5,
+    paddingHorizontal: 15
+  },
+  textInput: {
+    flex: 4
+  },
+  sendButton: {
+    backgroundColor: "#FF7B73",
     flex: 1,
-    alignItems: "flex-end",
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    alignItems: "center",
     justifyContent: "center"
   },
-  arrow: {
-    fontSize: 30,
-    color: "#333"
+  sendText: {
+    color: "#FFF"
   }
 });
