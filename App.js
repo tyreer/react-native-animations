@@ -1,168 +1,130 @@
 import React, { Component } from "react";
 import {
-  AppRegistry,
   StyleSheet,
-  Text,
   View,
-  PanResponder,
-  Animated,
-  TextInput,
-  ScrollView
+  TouchableWithoutFeedback,
+  Dimensions,
+  Animated
 } from "react-native";
 
+const { width, height } = Dimensions.get("window");
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
 export default class App extends Component {
-  componentWillMount() {
-    this.animated = new Animated.Value(0);
-    this.animatedMargin = new Animated.Value(0);
-    this.scrollOffset = 0;
-    this.contentHeight = 0;
-    this.scrollViewHeight = 0;
+  state = {
+    hearts: []
+  };
 
-    this.panResponder = PanResponder.create({
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        const { dy } = gestureState;
-        const totalScrollHeight = this.scrollOffset + this.scrollViewHeight;
-
-        if (
-          (this.scrollOffset <= 0 && dy > 0) ||
-          (totalScrollHeight >= this.contentHeight && dy < 0)
-        ) {
-          return true;
-        }
-      },
-      onPanResponderMove: (e, gestureState) => {
-        const { dy } = gestureState;
-        if (dy < 0) {
-          this.animated.setValue(dy);
-        } else if (dy > 0) {
-          this.animatedMargin.setValue(dy);
-        }
-      },
-      onPanResponderRelease: (e, gestureState) => {
-        const { dy } = gestureState;
-
-        // Animate away as a "swipe up"
-        // Opacity and translateY are animated
-        if (dy < -150) {
-          console.log("this.animatedMargin", this.animatedMargin);
-          Animated.parallel([
-            Animated.timing(this.animated, {
-              toValue: -400,
-              duration: 150
-            })
-          ]).start();
-
-          // Animate back to start position as a "bounce back on release"
-          // Values beneath the threshold have moved the container already
-          // but on release, the vertical offsets will reverse back to neutral
-        } else if (dy > -150 && dy < 150) {
-          Animated.parallel([
-            Animated.timing(this.animated, {
-              toValue: 0,
-              duration: 150
-            }),
-            Animated.timing(this.animatedMargin, {
-              toValue: 0,
-              duration: 150
-            })
-          ]).start();
-        } else if (dy > 150) {
-          Animated.parallel([
-            Animated.timing(this.animated, {
-              toValue: 400,
-              duration: 300
-            })
-          ]).start();
-        }
+  handleAddHeart = () => {
+    const animation = new Animated.Value(0);
+    this.setState(
+      state => ({
+        hearts: [
+          ...state.hearts,
+          { animation, start: getRandomInt(100, width - 100) }
+        ]
+      }),
+      () => {
+        Animated.timing(animation, {
+          toValue: height,
+          duration: 3000
+        }).start();
       }
-    });
-  }
+    );
+  };
 
   render() {
-    const spacerStyle = {
-      marginTop: this.animatedMargin
-    };
-
-    const opacityInterpolate = this.animated.interpolate({
-      inputRange: [-400, 0, 400],
-      outputRange: [0, 1, 0]
-    });
-    const modalStyle = {
-      transform: [{ translateY: this.animated }],
-      opacity: opacityInterpolate
-    };
-
     return (
       <View style={styles.container}>
-        <Animated.View style={spacerStyle} />
-        <Animated.View
-          style={[styles.modal, modalStyle]}
-          {...this.panResponder.panHandlers}
-        >
-          <View style={styles.comments}>
-            <ScrollView
-              scrollEventThrottle={16}
-              onScroll={event => {
-                this.scrollOffset = event.nativeEvent.contentOffset.y;
-                this.scrollViewHeight =
-                  event.nativeEvent.layoutMeasurement.height;
-              }}
-              onContentSizeChange={(contentWidth, contentHeight) =>
-                (this.contentHeight = contentHeight)
-              }
-            >
-              <Text style={styles.fakeText}>Top</Text>
-              <View style={styles.fakeComments} />
-              <Text style={styles.fakeText}>Bottom</Text>
-            </ScrollView>
+        <TouchableWithoutFeedback onPress={this.handleAddHeart}>
+          <View style={StyleSheet.absoluteFill}>
+            {this.state.hearts.map(({ animation, start }, index) => {
+              const positionInterpolate = animation.interpolate({
+                inputRange: [0, height],
+                outputRange: [height - 50, 0]
+              });
+
+              const opacityInterpolate = animation.interpolate({
+                inputRange: [0, height - 200],
+                outputRange: [1, 0]
+              });
+
+              const scaleInterpolate = animation.interpolate({
+                inputRange: [0, 15, 30],
+                outputRange: [0, 1.2, 1],
+                extrapolate: "clamp"
+              });
+
+              const dividedHeight = height / 6;
+
+              const wobbleInterpolate = animation.interpolate({
+                inputRange: [
+                  0,
+                  dividedHeight * 1,
+                  dividedHeight * 2,
+                  dividedHeight * 3,
+                  dividedHeight * 4,
+                  dividedHeight * 5,
+                  dividedHeight * 6
+                ],
+                outputRange: [0, 15, -15, 15, -15, 15, -15],
+                extrapolate: "clamp"
+              });
+
+              const heartStyle = {
+                left: start,
+                transform: [
+                  { translateY: positionInterpolate },
+                  { translateX: wobbleInterpolate },
+                  { scale: scaleInterpolate }
+                ],
+                opacity: opacityInterpolate
+              };
+
+              return <Heart key={index} style={heartStyle} />;
+            })}
           </View>
-          <View style={styles.inputWrap}>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Comment"
-              placeholderTextColor="white"
-            />
-          </View>
-        </Animated.View>
+        </TouchableWithoutFeedback>
       </View>
     );
   }
 }
 
+const Heart = ({ style }) => (
+  <Animated.View style={[styles.heart, style]}>
+    <View style={[styles.heartShape, styles.leftHeart]} />
+    <View style={[styles.heartShape, styles.rightHeart]} />
+  </Animated.View>
+);
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 30
+    flex: 1
   },
-  modal: {
-    flex: 1,
-    borderRadius: 15,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#333"
-  },
-  comments: {
-    flex: 1,
-    backgroundColor: "lightblue"
-  },
-  fakeText: {
-    padding: 15,
-    textAlign: "center"
-  },
-  fakeComments: {
-    height: 1000,
-    backgroundColor: "#f1f1f1"
-  },
-  inputWrap: {
-    flexDirection: "row",
-    paddingHorizontal: 15,
-    backgroundColor: "lightgrey"
-  },
-  textInput: {
-    flex: 1,
+  heart: {
+    width: 50,
     height: 50,
-    borderTopWidth: 1,
-    borderTopColor: "#000",
-    color: "white"
+    position: "absolute"
+  },
+  heartShape: {
+    width: 30,
+    height: 45,
+    position: "absolute",
+    top: 0,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    backgroundColor: "#6427d1"
+  },
+  leftHeart: {
+    transform: [{ rotate: "-45deg" }],
+    left: 5
+  },
+  rightHeart: {
+    transform: [{ rotate: "45deg" }],
+    right: 5
   }
 });
