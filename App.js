@@ -46,7 +46,14 @@ const getSeparator = i => {
 
 export default class App extends Component {
   state = {
-    animatedScroll: new Animated.Value(0)
+    animatedScroll: new Animated.Value(0),
+    scrollEnabled: true
+  };
+
+  handleFocus = focused => {
+    this.setState({
+      scrollEnabled: !focused
+    });
   };
 
   render() {
@@ -55,6 +62,7 @@ export default class App extends Component {
         <ScrollView
           pagingEnabled
           horizontal
+          scrollEnabled={this.state.scrollEnabled}
           scrollEventThrottle={16}
           onScroll={Animated.event([
             { nativeEvent: { contentOffset: { x: this.state.animatedScroll } } }
@@ -70,6 +78,8 @@ export default class App extends Component {
                   i,
                   Images.length
                 )}
+                onFocus={this.handleFocus}
+                focused={!this.state.scrollEnabled}
               />
             );
           })}

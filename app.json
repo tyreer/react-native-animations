@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "horizontal-parallax-scrollview",
-    "description": "Horizontal Parallax ScrollView from https://egghead.io/courses/real-world-react-native-animations",
-    "slug": "horizontal-parallax-scrollview",
+    "name": "information-callout",
+    "description": "Information Callout from https://egghead.io/courses/real-world-react-native-animations",
+    "slug": "information-callout",
     "privacy": "public",
     "sdkVersion": "31.0.0",
     "platforms": ["ios", "android"],
