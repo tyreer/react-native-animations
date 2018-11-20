@@ -1,9 +1,7 @@
-# Notes on Real World React Native Animations
+# Examples from "Real World React Native Animations"
 Egghead Course: https://egghead.io/courses/real-world-react-native-animations
 
-These are my notes on the Egghead course by [Jason Brown](https://egghead.io/instructors/jason-brown-20a6bf03-254a-428c-9984-dca76cc84f32)
-
-This repo contains Expo-compatible code for 9 of the animation examples Jason Brown made. I've modified the examples slightly, for instance to use [class properties](https://hackernoon.com/the-constructor-is-dead-long-live-the-constructor-c10871bea599) instead of constructors. Aside from a few other minor tweaks, the examples are essentially the same as those in Brown's examples repo [here](https://github.com/browniefed/examples). Below are my learning notes on the examples, which are mostly for me to remember key points, but might be useful to others too.
+This repo contains Expo-compatible code for 9 of the animation examples [Jason Brown](https://egghead.io/instructors/jason-brown-20a6bf03-254a-428c-9984-dca76cc84f32) made for his Egghead course. I've modified the examples slightly, for instance to use [class properties](https://hackernoon.com/the-constructor-is-dead-long-live-the-constructor-c10871bea599) instead of constructors. Aside from that and a few other minor tweaks, the examples are essentially the same as those in Brown's examples repo [here](https://github.com/browniefed/examples). 
 
 __Each example can be found on its own branch__
 
@@ -24,6 +22,8 @@ On __iOS devices__, you'll need to:
 + start a local server by running `expo start` 
 + open the app via an iOS simulator or the [Expo Client app](https://expo.io/learn)
 
+# Notes on Real World React Native Animations
+Below are my learning notes on the examples, which are mostly for me to remember key points, but might be useful to others too.
 
 ## Create a Horizontal Parallax ScrollView in React Native
 
