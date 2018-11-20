@@ -1,125 +1,82 @@
 import React, { Component } from "react";
 import {
   StyleSheet,
-  Text,
   View,
-  Animated,
-  TextInput,
-  TouchableWithoutFeedback,
-  TouchableOpacity
+  ScrollView,
+  Dimensions,
+  Animated
 } from "react-native";
+
+import Moment from "./moment";
+
+import drink1 from "./images/drink1.jpg";
+import drink2 from "./images/drink2.jpg";
+import drink3 from "./images/drink3.jpg";
+import drink4 from "./images/drink4.jpg";
+
+const { width } = Dimensions.get("window");
+const Images = [
+  { image: drink1, title: "Vodka Cran" },
+  { image: drink2, title: "Old Fashion" },
+  { image: drink3, title: "Mule" },
+  { image: drink4, title: "Strawberry Daiquiri" }
+];
+
+const getInterpolate = (animatedScroll, i) => {
+  const inputRange = [
+    i - 1 * width, // -1 * width // - 414
+    i * width, // 0 or width // 0 // When at width we do don't translate
+    (i + 1) * width // 1 * width // 828 // when we swipe past we will translate 150 left on prev picture
+  ];
+
+  const outputRange = i === 0 ? [0, 0, 150] : [-300, 0, 150];
+
+  return animatedScroll.interpolate({
+    inputRange,
+    outputRange,
+    extrapolate: "clamp"
+  });
+};
+
+const getSeparator = i => {
+  return (
+    <View key={i} style={[styles.separator, { left: (i - 1) * width - 2.5 }]} />
+  );
+};
 
 export default class App extends Component {
   state = {
-    animate: new Animated.Value(0),
-    success: false
-  };
-
-  handlePress = () => {
-    Animated.timing(this.state.animate, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true
-    }).start();
-  };
-
-  handleSend = () => {
-    this.setState(
-      {
-        success: true
-      },
-      () => {
-        Animated.sequence([
-          Animated.timing(this.state.animate, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true
-          }),
-          Animated.delay(1500)
-        ]).start(() => this.setState({ success: false }));
-      }
-    );
+    animatedScroll: new Animated.Value(0)
   };
 
   render() {
-    const notifyTextScaleInterpolate = this.state.animate.interpolate({
-      inputRange: [0, 0.5],
-      outputRange: [1, 0],
-      extrapolate: "clamp"
-    });
-
-    const inputScaleInterpolate = this.state.animate.interpolate({
-      inputRange: [0, 0.5, 0.6],
-      outputRange: [0, 0, 1],
-      extrapolate: "clamp"
-    });
-
-    const sendButtonInterpolate = this.state.animate.interpolate({
-      inputRange: [0, 0.6, 1],
-      outputRange: [0, 0, 1]
-    });
-
-    const thankyouScaleInterpolate = this.state.animate.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 0]
-    });
-
-    const notifyTextStyle = {
-      transform: [{ scale: notifyTextScaleInterpolate }]
-    };
-
-    const thankyouTextStyle = {
-      transform: [{ scale: thankyouScaleInterpolate }]
-    };
-
-    const inputWrapStyle = {
-      transform: [{ scale: inputScaleInterpolate }]
-    };
-
-    const sendButtonStyle = {
-      transform: [{ scale: sendButtonInterpolate }]
-    };
-
-    const { success } = this.state;
     return (
       <View style={styles.container}>
-        <TouchableWithoutFeedback onPress={this.handlePress}>
-          <Animated.View style={styles.buttonWrap}>
-            {!success && (
-              <Animated.View
-                style={[
-                  StyleSheet.absoluteFill,
-                  styles.inputWrap,
-                  inputWrapStyle
-                ]}
-              >
-                <TextInput
-                  keyboardType="email-address"
-                  placeholder="Email"
-                  placeholderTextColor="rgba(255,123,115, 0.8)"
-                  style={styles.textInput}
-                />
-                <TouchableOpacity
-                  style={[styles.sendButton, sendButtonStyle]}
-                  onPress={this.handleSend}
-                >
-                  <Text style={styles.sendText}>Send</Text>
-                </TouchableOpacity>
-              </Animated.View>
-            )}
-
-            {!success && (
-              <Animated.View style={notifyTextStyle}>
-                <Text style={styles.notifyText}>Notify Me</Text>
-              </Animated.View>
-            )}
-            {success && (
-              <Animated.View style={thankyouTextStyle}>
-                <Text style={styles.notifyText}>Thank You</Text>
-              </Animated.View>
-            )}
-          </Animated.View>
-        </TouchableWithoutFeedback>
+        <ScrollView
+          pagingEnabled
+          horizontal
+          scrollEventThrottle={16}
+          onScroll={Animated.event([
+            { nativeEvent: { contentOffset: { x: this.state.animatedScroll } } }
+          ])}
+        >
+          {Images.map((image, i) => {
+            return (
+              <Moment
+                key={i}
+                {...image}
+                translateX={getInterpolate(
+                  this.state.animatedScroll,
+                  i,
+                  Images.length
+                )}
+              />
+            );
+          })}
+          {Array.apply(null, { length: Images.length + 1 }).map((_, i) =>
+            getSeparator(i)
+          )}
+        </ScrollView>
       </View>
     );
   }
@@ -128,44 +85,13 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FF7B73",
-    flexDirection: "row"
+    backgroundColor: "#333"
   },
-  buttonWrap: {
-    backgroundColor: "#FFF",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    maxWidth: "80%",
-    flex: 1
-  },
-  notifyText: {
-    color: "#FF7B73",
-    fontWeight: "bold"
-  },
-  inputWrap: {
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingVertical: 5,
-    paddingHorizontal: 15
-  },
-  textInput: {
-    flex: 4
-  },
-  sendButton: {
-    backgroundColor: "#FF7B73",
-    flex: 1,
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    paddingVertical: 5,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  sendText: {
-    color: "#FFF"
+  separator: {
+    backgroundColor: "#000",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: 5
   }
 });
