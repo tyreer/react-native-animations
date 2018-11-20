@@ -1,9 +1,14 @@
 # Examples from "Real World React Native Animations"
 Egghead Course: https://egghead.io/courses/real-world-react-native-animations
 
-This repo contains Expo-compatible code for 9 of the animation examples [Jason Brown](https://egghead.io/instructors/jason-brown-20a6bf03-254a-428c-9984-dca76cc84f32) made for his Egghead course. I've modified the examples slightly, for instance to use [class properties](https://hackernoon.com/the-constructor-is-dead-long-live-the-constructor-c10871bea599) instead of constructors. Aside from that and a few other minor tweaks, the examples are essentially the same as those in Brown's examples repo [here](https://github.com/browniefed/examples). 
+This repo contains Expo-compatible code for 9 of the animation examples [Jason Brown](https://egghead.io/instructors/jason-brown-20a6bf03-254a-428c-9984-dca76cc84f32) made for his Egghead course. I've modified the examples slightly, for instance to use [class properties](https://hackernoon.com/the-constructor-is-dead-long-live-the-constructor-c10871bea599) instead of constructors. Aside from that and a few other minor tweaks, the examples are essentially the same as those in Brown's examples repo [here](https://github.com/browniefed/examples).
 
 __Each example can be found on its own branch__
+
+__Takeaways__
++ I found that the course offered some rich examples of how the [Animated library](https://facebook.github.io/react-native/docs/animated) can be used. 
++ The _swipe-away-modal_ example also helped shed some light on using RN's [PanResponder](https://facebook.github.io/react-native/docs/panresponder)
+
 
 On __Android devices__, all examples are accessible via Expo:
 + [horizontal-parallax-scrollview](https://exp.host/@tyreer/horizontal-parallax-scrollview)
